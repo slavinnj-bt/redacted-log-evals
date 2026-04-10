@@ -1,0 +1,4 @@
+.bt/skills/
+.env
+.agents/skills
+*pycache*
