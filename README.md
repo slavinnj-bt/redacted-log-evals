@@ -15,13 +15,13 @@ This CLI demo runs a multi-turn banking assistant, evaluates each turn before up
 
 The current implementation is structured so unredacted span `input` and `output` are never flushed to Braintrust.
 
-Validated from the code path in [banking_assistant_demo.py](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py):
+Validated from the code path in [banking_assistant_demo.py](banking_assistant_demo.py):
 
-- Global masking is enabled during tracing setup in [banking_assistant_demo.py:227](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L227) through [banking_assistant_demo.py:249](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L249).
-- Session and turn spans log raw `input` and `output` while masking is still enabled in [banking_assistant_demo.py:372](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L372) through [banking_assistant_demo.py:388](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L388) and [banking_assistant_demo.py:437](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L437) through [banking_assistant_demo.py:444](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L444).
-- The first `flush()` for each turn happens before masking is disabled in [banking_assistant_demo.py:328](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L328) through [banking_assistant_demo.py:331](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L331). That is the flush which can carry the raw trace payload, so Braintrust receives the redacted version.
-- Masking is disabled only after that first flush, and only to merge metadata and numeric scores in [banking_assistant_demo.py:331](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L331) through [banking_assistant_demo.py:339](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L339).
-- The session-level metadata merge follows the same pattern in [banking_assistant_demo.py:474](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L474) through [banking_assistant_demo.py:490](/Users/nick.slavin/repos/redacted-log-evals/banking_assistant_demo.py#L490).
+- Global masking is enabled during tracing setup in [banking_assistant_demo.py:227](banking_assistant_demo.py#L227) through [banking_assistant_demo.py:249](banking_assistant_demo.py#L249).
+- Session and turn spans log raw `input` and `output` while masking is still enabled in [banking_assistant_demo.py:372](banking_assistant_demo.py#L372) through [banking_assistant_demo.py:388](banking_assistant_demo.py#L388) and [banking_assistant_demo.py:437](banking_assistant_demo.py#L437) through [banking_assistant_demo.py:444](banking_assistant_demo.py#L444).
+- The first `flush()` for each turn happens before masking is disabled in [banking_assistant_demo.py:328](banking_assistant_demo.py#L328) through [banking_assistant_demo.py:331](banking_assistant_demo.py#L331). That is the flush which can carry the raw trace payload, so Braintrust receives the redacted version.
+- Masking is disabled only after that first flush, and only to merge metadata and numeric scores in [banking_assistant_demo.py:331](banking_assistant_demo.py#L331) through [banking_assistant_demo.py:339](banking_assistant_demo.py#L339).
+- The session-level metadata merge follows the same pattern in [banking_assistant_demo.py:474](banking_assistant_demo.py#L474) through [banking_assistant_demo.py:490](banking_assistant_demo.py#L490).
 - Autoevals wraps its OpenAI client and creates Braintrust spans for eval model calls, but those spans are still covered by the same global masking function and there is no `flush()` inside Autoevals or the OpenAI wrapper.
 
 What this means in practice:
